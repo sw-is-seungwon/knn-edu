@@ -54,7 +54,7 @@
 <div class="container">
     <h1> 🔎지도학습 - k-최근접 이웃(KNN) 데이터 생성기🔎</h1>
 
-  <div class="notice-box">
+    <div class="notice-box">
         <strong>💡 활동 안내</strong><br>
         1. 생성 조건(개수, 범위 등)을 설정하고 버튼을 누르세요.<br>
         2. 화면에 나온 카테고리별 좌표 데이터를 활동지에 옮겨 적으세요.<br>
@@ -111,7 +111,7 @@
         const minY = parseInt(document.getElementById('minY').value);
         const maxY = parseInt(document.getElementById('maxY').value);
 
-        // 예외 처리: 범위 내 생성 가능한 좌표보다 요청한 개수가 많을 시 중복된 데이터를 출력할 수 없으므로 안내 문구 출력
+        // 예외 처리
         const maxPossiblePoints = (maxX - minX + 1) * (maxY - minY + 1);
         if (totalCount > maxPossiblePoints) {
             alert(`입력하신 범위에서 중복 없이 생성할 수 있는 최대 데이터 개수는 ${maxPossiblePoints}개입니다. 범위를 넓히거나 개수를 줄여주세요.`);
@@ -121,7 +121,7 @@
         const usedPositions = new Set();
         const dataList = [];
 
-        // 카테고리별로 균등하게 개수 분할
+        // 카테고리별 분할 계산
         const baseCount = Math.floor(totalCount / catCount);
         let remainder = totalCount % catCount;
 
@@ -131,7 +131,6 @@
 
             for (let j = 0; j < countForThisCat; j++) {
                 let x, y, key;
-                // 중복되지 않는 좌표를 찾을 때까지 반복하기
                 do {
                     x = Math.floor(Math.random() * (maxX - minX + 1)) + minX;
                     y = Math.floor(Math.random() * (maxY - minY + 1)) + minY;
@@ -139,11 +138,12 @@
                 } while (usedPositions.has(key));
 
                 usedPositions.add(key);
-                dataList.push({ x, y, category: categoriesConfig[i] });
+                // 중요: 확실하게 매핑된 카테고리 객체를 넘겨줍니다.
+                dataList.push({ x: x, y: y, category: categoriesConfig[i] });
             }
         }
 
-        // 카테고리별로 정렬, 같은 카테고리 내에서는 X값 순으로 정렬!
+        // 🔄 카테고리 이름순으로 정렬 후, 동일 카테고리 내에서는 x값 기준으로 한 번 더 정렬!
         dataList.sort((a, b) => {
             if (a.category.name !== b.category.name) {
                 return a.category.name.localeCompare(b.category.name);
@@ -151,7 +151,7 @@
             return a.x - b.x || a.y - b.y;
         });
 
-        // UI에 렌더링
+        // UI 렌더링 호출
         displayResults(dataList);
     }
 
@@ -167,9 +167,8 @@
             const itemDiv = document.createElement('div');
             itemDiv.className = 'data-item';
 
-            // 도형 스타일 설정
+            // 도형 스타일 개별 지정
             let shapeStyle = `background-color: ${item.category.color};`;
-           // 삼각형 색상 조정
             if (item.category.shape === 'triangle') {
                 shapeStyle = `border-bottom-color: ${item.category.color};`;
             }
